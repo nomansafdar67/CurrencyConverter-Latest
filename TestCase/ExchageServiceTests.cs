@@ -75,10 +75,10 @@ namespace CurrencyConverter.TestCase
 
             SetupHttpClientFactory(mockResponse);
 
-            // Act
+            
             var result = await _currencyService.GetLatestRates(baseCurrency);
 
-            // Assert
+            
             Assert.NotNull(result);
             Assert.Equal(expectedRates.Base, result.Base);
             Assert.Equal(expectedRates.Rates["EUR"], result.Rates["EUR"]);
@@ -88,13 +88,13 @@ namespace CurrencyConverter.TestCase
         [Fact]
         public async Task GetLatestRates_ShouldThrowException_WhenApiFails()
         {
-            // Arrange
+            
             var baseCurrency = "USD";
             var mockResponse = new HttpResponseMessage(HttpStatusCode.InternalServerError);
 
             SetupHttpClientFactory(mockResponse);
 
-            // Act & Assert
+            
             var exception = await Assert.ThrowsAsync<Exception>(() => _currencyService.GetLatestRates(baseCurrency));
             Assert.Equal("An error occurred while fetching the latest rates. Please try again later.", exception.Message);
         }
@@ -102,16 +102,16 @@ namespace CurrencyConverter.TestCase
         [Fact]
         public async Task GetLatestRates_ShouldThrowException_WhenResponseCannotBeDeserialized()
         {
-            // Arrange
+          
             var baseCurrency = "USD";
             var mockResponse = new HttpResponseMessage(HttpStatusCode.OK)
             {
-                Content = new StringContent("{\"base\":\"USD\",\"rates\":}") // Invalid JSON for rates
+                Content = new StringContent("{\"base\":\"USD\",\"rates\":}")
             };
 
             SetupHttpClientFactory(mockResponse);
 
-            // Act & Assert
+            
             var exception = await Assert.ThrowsAsync<Exception>(() => _currencyService.GetLatestRates(baseCurrency));
             Assert.Equal("An error occurred while fetching the latest rates. Please try again later.", exception.Message);
         }
@@ -123,7 +123,7 @@ namespace CurrencyConverter.TestCase
         [Fact]
         public async Task ConvertCurrency_ShouldReturnConvertedAmount_WhenRequestIsSuccessful()
         {
-            // Arrange
+           
             var request = new ConversionRequest
             {
                 SourceCurrency = "USD",
@@ -138,18 +138,18 @@ namespace CurrencyConverter.TestCase
 
             SetupHttpClientFactory(mockResponse);
 
-            // Act
+            
             var result = await _currencyService.ConvertCurrency(request);
 
-            // Assert
+            
             Assert.NotNull(result);
-            Assert.Equal(85, result.ConvertedAmount); // 100 * 0.85 = 85
+            Assert.Equal(85, result.ConvertedAmount);
         }
 
         [Fact]
         public async Task ConvertCurrency_ShouldReturnNull_WhenTargetCurrencyIsNotFoundInRates()
         {
-            // Arrange
+            
             var request = new ConversionRequest
             {
                 SourceCurrency = "USD",
@@ -159,22 +159,21 @@ namespace CurrencyConverter.TestCase
 
             var mockResponse = new HttpResponseMessage(HttpStatusCode.OK)
             {
-                Content = new StringContent("{\"base\":\"USD\",\"rates\":{\"EUR\":0.85}}") // GBP not present
+                Content = new StringContent("{\"base\":\"USD\",\"rates\":{\"EUR\":0.85}}") 
             };
 
             SetupHttpClientFactory(mockResponse);
 
-            // Act
+           
             var result = await _currencyService.ConvertCurrency(request);
 
-            // Assert
-            Assert.Null(result); // GBP is missing from the rates
+            
+            Assert.Null(result);
         }
 
         [Fact]
         public async Task ConvertCurrency_ShouldThrowException_WhenHttpRequestFails()
         {
-            // Arrange
             var request = new ConversionRequest
             {
                 SourceCurrency = "USD",
@@ -186,34 +185,10 @@ namespace CurrencyConverter.TestCase
 
             SetupHttpClientFactory(mockResponse);
 
-            // Act & Assert
+            
             var exception = await Assert.ThrowsAsync<Exception>(() => _currencyService.ConvertCurrency(request));
             Assert.Equal("An error occurred while converting currency. Please try again later.", exception.Message);
         }
-
-        //[Fact]
-        //public async Task ConvertCurrency_ShouldThrowException_WhenUnsupportedCurrencyIsRequested()
-        //{
-        //    // Arrange
-        //    var excludedCurrencies = new[] { "TRY", "PLN", "THB", "MXN" };
-        //    var request = new ConversionRequest
-        //    {
-        //        SourceCurrency = "USD",
-        //        TargetCurrency = "TRY", // Unsupported currency
-        //        Amount = 100
-        //    };
-
-        //    var mockResponse = new HttpResponseMessage(HttpStatusCode.OK)
-        //    {
-        //        Content = new StringContent("{\"base\":\"USD\",\"rates\":{\"EUR\":0.85}}") // EUR is supported, TRY is not
-        //    };
-
-        //    SetupHttpClientFactory(mockResponse);
-
-        //    // Act & Assert
-        //    var exception = await Assert.ThrowsAsync<Exception>(() => _currencyService.ConvertCurrency(request));
-        //    Assert.Equal("An error occurred while converting currency. Please try again later.", exception.Message);
-        //}
 
 
         #endregion
@@ -250,10 +225,9 @@ namespace CurrencyConverter.TestCase
 
             SetupHttpClientFactory(mockResponse);
 
-            // Act
             var result = await _currencyService.GetHistoricalRates(request);
 
-            // Assert
+            
             Assert.NotNull(result);
             Assert.Equal(historicalRatesResponse.Base, result.Data.FirstOrDefault().Base);
         }
@@ -261,7 +235,6 @@ namespace CurrencyConverter.TestCase
         [Fact]
         public async Task GetHistoricalRates_ShouldThrowException_WhenApiFails()
         {
-            // Arrange
             var request = new HistoricalRatesRequest
             {
                 BaseCurrency = "USD",
@@ -275,7 +248,6 @@ namespace CurrencyConverter.TestCase
 
             SetupHttpClientFactory(mockResponse);
 
-            // Act & Assert
             var exception = await Assert.ThrowsAsync<Exception>(() => _currencyService.GetHistoricalRates(request));
             Assert.Equal("An error occurred while fetching historical rates. Please try again later.", exception.Message);
         }
@@ -300,7 +272,6 @@ namespace CurrencyConverter.TestCase
 
             SetupHttpClientFactory(mockResponse);
 
-            // Act & Assert
             var exception = await Assert.ThrowsAsync<Exception>(() => _currencyService.GetHistoricalRates(request));
             Assert.Equal("An error occurred while fetching historical rates. Please try again later.", exception.Message);
         }

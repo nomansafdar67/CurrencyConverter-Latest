@@ -53,9 +53,8 @@ namespace CurrencyConverter.Service
                     var response = await client.GetAsync($"/latest?base={request.SourceCurrency}");
                     response.EnsureSuccessStatusCode();
                     var rates = await response.Content.ReadFromJsonAsync<LatestRatesResponse>();
-
-                //if (!(rates?.Rates?.ContainsKey(request.TargetCurrency) ?? false))
-                //        return null;
+                    if (!(rates?.Rates?.ContainsKey(request.TargetCurrency) ?? false))
+                        return null;
                     var convertedAmount = request.Amount * rates.Rates[request.TargetCurrency];
                     return new ConversionResponse { ConvertedAmount = convertedAmount }
                            ?? throw new Exception("Failed to deserialize ConversionResponse.");
